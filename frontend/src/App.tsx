@@ -6,7 +6,12 @@ function App() {
     const [calculate, fetchHistory] = useBackend()
 
     return (
-        <CalculatePage onCalculate={calculate} onFetchHistory={fetchHistory} />
+        <CalculatePage 
+        isCalculating={false} 
+        result={undefined} 
+        history={[]} 
+        onCalculate={calculate} 
+        onFetchHistory={fetchHistory} />
     )
 }
 

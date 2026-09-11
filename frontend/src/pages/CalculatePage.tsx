@@ -1,6 +1,6 @@
 import { Container } from 'react-bootstrap'
 
-function CalculatePage() {
+function CalculatePage(props: any) {
     return (
         <Container>
             "Hello, TypeScript!"
