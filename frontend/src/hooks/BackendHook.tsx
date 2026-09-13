@@ -1,6 +1,7 @@
 import api from "../api/index.ts"
+import type { SuccessExpression, ErrorExpression } from "../Expressions.tsx"
 
-interface SuccessReponse {
+interface SuccessResponse {
     result: number
 }
 
@@ -8,19 +9,9 @@ interface ErrorResponse {
     message: string
 }
 
-interface SuccessExpression {
-    expression: string,
-    answer: number
-}
-
-interface ErrorExpression {
-    expression: string,
-    message: string
-}
-
 function useBackend() {
 
-    async function calculate(expression: string): Promise<SuccessReponse | ErrorResponse> {
+    async function calculate(expression: string): Promise<SuccessResponse | ErrorResponse> {
         return (await api.post("/", expression)).data
     }
 
