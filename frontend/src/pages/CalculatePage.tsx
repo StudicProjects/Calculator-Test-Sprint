@@ -26,15 +26,15 @@ function CalculatePage(props: any) {
     const [isHistoryLoading, setHistory] = useState(false);
     const [showModal, setModal] = useState(false);
 
-    const handleHistoryClick = async () =>{
-        setHistory(true); 
+    const handleHistoryClick = async () => {
+        setHistory(true);
         try {
-            await onFetchHistory(); 
-            setModal(true); 
-            } catch (error) {
-                alert("Не удалось получить историю с сервера");
-            } finally {
-                setHistory(false); 
+            await onFetchHistory();
+            setModal(true);
+        } catch (error) {
+            alert("Не удалось получить историю с сервера");
+        } finally {
+            setHistory(false);
         }
     }
 
@@ -66,6 +66,7 @@ function CalculatePage(props: any) {
                 <Form.Control
                     type="text"
                     value={textArea.expression}
+                    onChange={textArea.handleChange}
                     disabled={isCalcualting}
                     className="text-end fs-4"
                     style={{ boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.4), 0 3px 4px rgba(0,0,0,0.3)' }}
@@ -90,7 +91,7 @@ function CalculatePage(props: any) {
                     <HistoryList
                         records={history}
                         onItemClick={(clickedText: string) => {
-                            textArea.setExpression(textArea.expression === '' ? clickedText : textArea.expression + ' ' + clickedText); // Тоже в хук вынести
+                            textArea.onHistoryElementSet(clickedText);
                             setModal(false);
                         }}
                     />

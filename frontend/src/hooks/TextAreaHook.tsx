@@ -5,10 +5,12 @@ export interface TextAreaHook {
     setExpression: (expression: string) => void;
     handleCalculateClick: () => void;
     setResultIfNotNull: (result: string | number | undefined) => void;
+    handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
     onNumberClick: (symbol: string) => void;
     onOperationClick: (oper: string) => void;
     onACClick: () => void;
     onDeleteClick: () => void;
+    onHistoryElementSet: (clickedText: string) => void; // Перевести на SuccesExpression | ErrorExpression
 }
 
 export function useTextArea(onCalculate: (expression: string) => void) {
@@ -33,6 +35,20 @@ export function useTextArea(onCalculate: (expression: string) => void) {
 
     // - - -
 
+    function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
+        function isOperation(char: string): boolean {
+            return ['+', '-', '*', '/', '^', '%'].includes(char);
+        }
+
+        const newExp = event.target.value;
+        const lastSymbol = newExp[newExp.length - 1];
+        if (newExp.length == expression.length + 1 && isOperation(lastSymbol)) {
+            setExpression(expression + (expression.endsWith(' ') ? "" : " ") + lastSymbol + " ");
+        }
+        else
+            setExpression(event.target.value);
+    };
+
     function onNumberClick(symbol: string) {
         setExpression(expression + symbol);
     };
@@ -45,7 +61,7 @@ export function useTextArea(onCalculate: (expression: string) => void) {
         setExpression("");
     };
 
-    const onDeleteClick = () => {
+    function onDeleteClick() {
         if (expression.endsWith(' ')) {
             setExpression(expression.slice(0, -3));
         } else {
@@ -53,14 +69,21 @@ export function useTextArea(onCalculate: (expression: string) => void) {
         }
     };
 
+    function onHistoryElementSet(clickedText: string) {
+        if (expression !== '') setExpression(expression + ' ')
+        setExpression(expression + clickedText);
+    }
+
     return {
         expression,
         setExpression,
         handleCalculateClick,
         setResultIfNotNull,
+        handleChange,
         onNumberClick,
         onOperationClick,
         onACClick,
-        onDeleteClick
+        onDeleteClick,
+        onHistoryElementSet
     } as TextAreaHook;
 }
