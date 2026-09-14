@@ -26,12 +26,14 @@ func (r *HistoryRepository) SaveRecord(ctx context.Context, record *models.Histo
 	return err
 }
 
-func (r *HistoryRepository) GetRecords(ctx context.Context) ([]models.HistoryRecord, error) {
+func (r *HistoryRepository) GetRecords(ctx context.Context, limit int, offset int) ([]models.HistoryRecord, error) {
 	rows, err := r.pool.Query(ctx, `
 		SELECT id, expression, result
 		FROM history
 		ORDER BY id DESC
-	`)
+		LIMIT $1
+		OFFSET $2
+		`,limit, offset)
 	if err != nil {
 		return nil, err
 	}
