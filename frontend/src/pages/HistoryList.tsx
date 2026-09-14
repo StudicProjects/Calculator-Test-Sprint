@@ -1,4 +1,5 @@
 import { Row, Col, Button } from 'react-bootstrap';
+import type { SuccessExpression } from '../Expressions';
 
 function HistoryList(props: any) {
     const records = props.records;
@@ -18,9 +19,9 @@ function HistoryList(props: any) {
 
     return (
         <div style={{ maxHeight: '300px', overflowY: 'auto', paddingRight: '5px' }}>
-            {records.map((item: [string, string], index: number) => {
-                const expressionText = item[0];
-                const resultText = item[1];
+            {records.map((item: (SuccessExpression), index: number) => {
+                const expressionText = item.expression;
+                const resultText = item.answer;
 
                 return (
                     <div 
@@ -37,7 +38,7 @@ function HistoryList(props: any) {
                                 <Button 
                                     className="w-100 text-start push-button text-truncate"
                                     style={{ backgroundColor: '#A3BCA9', color: '#4A3525', border: 'none', fontSize: '0.9rem' }}
-                                    onClick={() => onItemClick(expressionText)}
+                                    onClick={() => onItemClick(expressionText) }
                                 >
                                     {expressionText}
                                 </Button>

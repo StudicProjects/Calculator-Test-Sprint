@@ -29,7 +29,7 @@ function CalculatePage(props: any) {
     const handleHistoryClick = async () => {
         setHistory(true);
         try {
-            await onFetchHistory();
+            //await onFetchHistory();
             setModal(true);
         } catch (error) {
             alert("Не удалось получить историю с сервера");
@@ -91,7 +91,7 @@ function CalculatePage(props: any) {
                     <HistoryList
                         records={history}
                         onItemClick={(clickedText: string) => {
-                            textArea.onHistoryElementSet(clickedText);
+                            textArea.onSetHistoryElement(clickedText);
                             setModal(false);
                         }}
                     />
