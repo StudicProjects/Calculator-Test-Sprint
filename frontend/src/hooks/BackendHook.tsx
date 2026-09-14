@@ -12,11 +12,11 @@ interface ErrorResponse {
 function useBackend() {
 
     async function calculate(expression: string): Promise<SuccessResponse | ErrorResponse> {
-        return (await api.post("/", expression)).data
+        return (await api.post("/eval", expression)).data
     }
 
     async function fetchHistory(): Promise<(SuccessExpression | ErrorExpression)[]> {
-        return (await api.get("/")).data
+        return (await api.get("/history")).data
     }
 
     return [calculate, fetchHistory] as const
