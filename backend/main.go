@@ -8,7 +8,6 @@ import (
 	"os"
 
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/joho/godotenv"
 	"github.com/tortedCtrl/Calculator-Test-Sprint/models"
 	"github.com/tortedCtrl/Calculator-Test-Sprint/repository"
 	"github.com/tortedCtrl/Calculator-Test-Sprint/rest"
@@ -16,9 +15,6 @@ import (
 )
 
 func parseEnvConfig() (*models.EnvConfig, error) {
-	if err := godotenv.Load(); err != nil {
-		return nil, err
-	}
 	return &models.EnvConfig{
 		AppPort:    os.Getenv("APP_PORT"),
 		DbUser:     os.Getenv("DB_USER"),
@@ -74,5 +70,5 @@ func main() {
 	handler := rest.NewHandler(calculator)
 	handler.RegisterRoutes(mux)
 
-	log.Fatal(http.ListenAndServe(fmt.Sprintf("localhost:%s", config.AppPort), mux))
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", config.AppPort), mux))
 }
