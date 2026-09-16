@@ -9,17 +9,17 @@ import { useTextArea } from '../hooks/TextAreaHook.tsx'
 function CalculatePage(props: any) {
     const isCalcualting = props.isCalcualting
     const result = props.result
-    //const history = props.history
-    const history: (SuccessExpression | ErrorExpression)[] = [
-        { expression: "2 + 2", answer: 4 },
-        { expression: "(10 + 5) * 2", answer: 30 },
-        { expression: "100 ÷ 4", answer: 25 },
-        { expression: "50 % 10", answer: 0 },
-        { expression: "7 + 8 - 3", answer: 12 },
-        { expression: "2 ^ 3", answer: 8 },
-        { expression: "(25 * 4) + 50", answer: 150 },
-        { expression: "99 + 1", answer: 100 }
-    ];
+    const history = props.history
+    // const history: (SuccessExpression | ErrorExpression)[] = [
+    //     { expression: "2 + 2", answer: 4 },
+    //     { expression: "(10 + 5) * 2", answer: 30 },
+    //     { expression: "100 ÷ 4", answer: 25 },
+    //     { expression: "50 % 10", answer: 0 },
+    //     { expression: "7 + 8 - 3", answer: 12 },
+    //     { expression: "2 ^ 3", answer: 8 },
+    //     { expression: "(25 * 4) + 50", answer: 150 },
+    //     { expression: "99 + 1", answer: 100 }
+    // ];
     const onCalculate = props.onCalculate
     const onFetchHistory = props.onFetchHistory
     const textArea: TextAreaHook = useTextArea(onCalculate)
@@ -29,7 +29,7 @@ function CalculatePage(props: any) {
     const handleHistoryClick = async () => {
         setHistory(true);
         try {
-            //await onFetchHistory();
+            await onFetchHistory();
             setModal(true);
         } catch (error) {
             alert("Не удалось получить историю с сервера");

@@ -54,7 +54,7 @@ function CalculatorGrid(props: any) {
                 <Col xs={3}><Button variant="light" className="w-100 push-button" style={{ backgroundColor: '#E8DFFF', color: '#4A3525', border: 'none', boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.4), 0 3px 4px rgba(0,0,0,0.3)' }} onClick={() => textArea.onDeleteClick()}>delete</Button></Col>
                 <OperationButton char='-' />            </Row>
             <Row className="g-2 mb-2">
-                <Col xs={9}><Button variant="light" className="w-100 push-button" style={{ backgroundColor: '#E5A93C', color: '#4A3525', border: 'none', boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.4), 0 3px 4px rgba(0,0,0,0.3)' }} onClick={() => textArea.onCalculateClick()} disabled={isCalcualting} >=</Button></Col>
+                <Col xs={9}><Button variant="light" className="w-100 push-button" style={{ backgroundColor: '#E5A93C', color: '#4A3525', border: 'none', boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.4), 0 3px 4px rgba(0,0,0,0.3)' }} onClick={() => textArea.handleCalculateClick()} disabled={isCalcualting} >=</Button></Col>
                 <OperationButton char='^' />
             </Row>
 
