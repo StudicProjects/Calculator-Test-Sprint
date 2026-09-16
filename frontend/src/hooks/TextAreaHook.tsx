@@ -10,7 +10,7 @@ export interface TextAreaHook {
     onOperationClick: (oper: string) => void;
     onACClick: () => void;
     onDeleteClick: () => void;
-    onHistoryElementSet: (clickedText: string) => void; // Перевести на SuccesExpression | ErrorExpression
+    onSetHistoryElement: (clickedText: string) => void; // Extract в другой хук
 }
 
 export function useTextArea(onCalculate: (expression: string) => void) {
@@ -69,9 +69,8 @@ export function useTextArea(onCalculate: (expression: string) => void) {
         }
     };
 
-    function onHistoryElementSet(clickedText: string) {
-        if (expression !== '') setExpression(expression + ' ')
-        setExpression(expression + clickedText);
+    function onSetHistoryElement(clickedText: string) {
+        setExpression(clickedText);
     }
 
     return {
@@ -84,6 +83,6 @@ export function useTextArea(onCalculate: (expression: string) => void) {
         onOperationClick,
         onACClick,
         onDeleteClick,
-        onHistoryElementSet
+        onSetHistoryElement
     } as TextAreaHook;
 }
