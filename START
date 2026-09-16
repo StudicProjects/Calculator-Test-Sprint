@@ -1,0 +1,6 @@
+#!/bin/bash
+cd "$(dirname "$0")"
+sudo systemctl start docker
+docker compose up -d --build
+cd frontend
+ptyxis -- bash -c "npm run dev; exec bash"

@@ -1,0 +1,133 @@
+#!/bin/bash
+
+# Скрипт настройки окружения для проекта Calculator-Test-Sprint
+# Автоматически создаёт .env с случайным паролем, если его нет.
+# ВАЖНО: Этот код сгенерен и особо не проверялся на корректность, тк у меня уже все установлено, но по идее должен помочь установить все необходиое (по крайней мере, большую часть)
+
+set -e
+
+# --- 1. Проверка ОС ---
+if ! command -v dnf &> /dev/null; then
+    echo "Ошибка: скрипт рассчитан на Fedora (dnf). Для других дистрибутивов адаптируй команды."
+    exit 1
+fi
+
+# --- 2. Создание .env, если его нет ---
+ENV_FILE=".env"
+if [ ! -f "$ENV_FILE" ]; then
+    echo "=== Файл .env не найден. Создаю с случайным паролем. ==="
+
+    # Генерируем случайный пароль (16 символов, только буквы и цифры)
+    DB_PASSWORD=$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 16)
+
+    cat > "$ENV_FILE" <<EOF
+# Автоматически создан скриптом setup-project.sh
+# Не коммить этот файл в репозиторий!
+
+APP_PORT=8000
+DB_USER=asus
+DB_PASSWORD=${DB_PASSWORD}
+DB_HOST=postgres
+DB_PORT=5432
+DB_NAME=calculator
+EOF
+
+    echo "Файл .env создан. Пароль сохранён в $ENV_FILE"
+    echo "Если хочешь задать свой пароль — открой $ENV_FILE и измени DB_PASSWORD."
+else
+    echo "=== Файл .env уже существует. Использую его. ==="
+fi
+
+# Проверяем, что .env в .gitignore
+if [ -f ".gitignore" ]; then
+    if ! grep -q "^\.env$" .gitignore; then
+        echo ".env" >> .gitignore
+        echo "Добавил .env в .gitignore, чтобы пароль не попал в репозиторий."
+    fi
+else
+    echo ".env" > .gitignore
+    echo "Создал .gitignore с записью .env."
+fi
+
+# --- 3. Установка базовых утилит ---
+echo "=== 3. Установка базовых утилит ==="
+sudo dnf install -y git curl wget dnf-plugins-core
+
+# --- 4. Установка Docker + Compose ---
+if ! command -v docker &> /dev/null; then
+    echo "=== 4. Установка Docker ==="
+    sudo dnf remove -y docker docker-client docker-client-latest docker-common \
+      docker-latest docker-latest-logrotate docker-logrotate docker-engine 2>/dev/null || true
+
+    sudo dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
+    sudo dnf install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+    sudo systemctl enable --now docker
+    sudo usermod -aG docker "$USER"
+    echo "Docker установлен. Возможно, потребуется перезагрузка для применения прав группы."
+else
+    echo "Docker уже установлен."
+fi
+
+# --- 5. Установка Node.js через NVM ---
+export NVM_DIR="$HOME/.nvm"
+if [ ! -d "$NVM_DIR" ]; then
+    echo "=== 5. Установка NVM и Node.js ==="
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+    nvm install 22
+    nvm alias default 22
+else
+    echo "NVM уже установлен."
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+    if ! command -v node &> /dev/null; then
+        nvm install 22
+        nvm alias default 22
+    fi
+fi
+
+# --- 6. Установка Go ---
+if ! command -v go &> /dev/null; then
+    echo "=== 6. Установка Go ==="
+    GO_VERSION="1.24.0"
+    wget -q "https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz" -O /tmp/go.tar.gz
+    sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf /tmp/go.tar.gz
+    rm /tmp/go.tar.gz
+
+    if ! grep -q "/usr/local/go/bin" "$HOME/.profile"; then
+        echo 'export PATH=$PATH:/usr/local/go/bin' >> "$HOME/.profile"
+    fi
+    export PATH=$PATH:/usr/local/go/bin
+else
+    echo "Go уже установлен."
+fi
+
+# --- 7. Установка Ptyxis ---
+if ! command -v ptyxis &> /dev/null; then
+    echo "=== 7. Установка Ptyxis ==="
+    sudo dnf install -y ptyxis
+else
+    echo "Ptyxis уже установлен."
+fi
+
+# --- 8. Установка зависимостей фронтенда ---
+if [ -d "frontend" ] && [ -f "frontend/package.json" ]; then
+    echo "=== 8. Установка зависимостей фронтенда ==="
+    (cd frontend && npm install)
+else
+    echo "Внимание: папка frontend или package.json не найдены. Пропускаю."
+fi
+
+# --- 9. Запуск контейнеров (PostgreSQL + миграции + бэкенд) ---
+echo "=== 9. Запуск Docker Compose ==="
+if command -v docker &> /dev/null && docker ps &> /dev/null; then
+    docker compose up -d --build
+    echo "Контейнеры запущены. Проверь: docker compose ps"
+else
+    echo "Docker требует sudo или ещё не активирован. Перезагрузись и запусти: docker compose up -d --build"
+fi
+
+echo ""
+echo "=== Настройка завершена! ==="
+echo "Пароль от БД сохранён в .env (файл не попадёт в git)."
+echo "Для запуска фронтенда: cd frontend && npm run dev"
+echo "Для запуска бэкенда: docker compose up -d (уже запущен, если Docker активирован)"
