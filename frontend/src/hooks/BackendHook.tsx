@@ -1,22 +1,38 @@
 import api from "../api/index.ts"
 import type { SuccessExpression, ErrorExpression } from "../Expressions.tsx"
 
-interface SuccessResponse {
-    result: number
+// Контракт из документации
+interface EvalExpressionRequest {
+    expression: string
 }
 
-interface ErrorResponse {
+interface EvalExpressionResponse {
+    expression: string
+    result: string
+}
+
+interface HistoryRecord {
+    expression: string
+    result: string
+}
+
+interface CalculatorError {
+    type: 'ValidationError' | 'BadExpression' | 'ExpressionLengthLimitExceeded' | 'InternalError'
     message: string
+    expression?: string
+    length?: number
+    limit?: number
 }
 
 function useBackend() {
 
-    async function calculate(expression: string): Promise<SuccessResponse | ErrorResponse> {
-        return (await api.post("/eval", expression)).data
+    async function calculate(expression: string): Promise<EvalExpressionResponse> {
+        const payload: EvalExpressionRequest = { expression }
+        return (await api.post<EvalExpressionResponse>("eval", payload)).data
     }
 
-    async function fetchHistory(): Promise<(SuccessExpression | ErrorExpression)[]> {
-        return (await api.get("/history")).data
+    async function fetchHistory(): Promise<HistoryRecord[]> {
+        return (await api.get<HistoryRecord[]>("history")).data
     }
 
     return [calculate, fetchHistory] as const
