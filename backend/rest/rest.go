@@ -52,6 +52,25 @@ func (h *Handler) EvalExpression(w http.ResponseWriter, req *http.Request) {
 }
 
 func (h *Handler) GetHistory(w http.ResponseWriter, req *http.Request) {
+	limit:= 20
+	offset:=10
+
+	if value:=req.URL.Query().Get("limit"); value != ""{
+		parsed,err := strconv.Atoi(value)
+		if err!=nil {
+			handleError(w, models.NewValidationError("limit must be an int"))
+			return
+		}
+		limit = parsed
+	}
+	if value:=req.URL.Query().Get("offset"); value != ""{
+		parsed,err := strconv.Atoi(value)
+		if err!=nil {
+			handleError(w, models.NewValidationError("offset must be an int"))
+			return
+		}
+		offset = parsed
+	}
 	records, err := h.calculator.GetHistory(req.Context())
 	if err != nil {
 		handleError(w, err)
